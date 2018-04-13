@@ -292,12 +292,17 @@ void analogies(const std::vector<std::string> args) {
 void train(const std::vector<std::string> args) {
   Args a = Args();
   a.parseArgs(args);
-  FastText fasttext;
-  std::ofstream ofs(a.output+".bin");
+
+  if (a.output + ".bin" == a.inputModel) {
+    throw std::invalid_argument("\n" + a.inputModel + ": Using the same filename for inputModel and output model would overwrite the inputModel and fail the incremental training");
+  }
+  std::ofstream ofs(a.output + ".bin");
   if (!ofs.is_open()) {
     throw std::invalid_argument(a.output + ".bin cannot be opened for saving.");
   }
   ofs.close();
+  
+  FastText fasttext;
   fasttext.train(a);
   fasttext.saveModel();
   fasttext.saveVectors();
